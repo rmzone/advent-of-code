@@ -1,0 +1,30 @@
+[package]
+name = "day-16"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+itertools = { workspace = true }
+nom = { workspace = true }
+nom_locate = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+miette = { workspace = true }
+thiserror = { workspace = true }
+dhat = { workspace = true }
+glam = { workspace = true }
+array2d = "0.3.1"
+bytes = "1.5.0"
+
+[dev-dependencies]
+divan = { workspace = true }
+rstest = { workspace = true }
+
+[[bench]]
+name = "day-16"
+path = "benches/benchmarks.rs"
+harness = false
+
+[features]
+dhat-heap = []

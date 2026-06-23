@@ -1,0 +1,29 @@
+[package]
+name = "day-19"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+itertools = { workspace = true }
+nom = { workspace = true }
+nom-supreme = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+miette = { workspace = true }
+thiserror = { workspace = true }
+dhat = { workspace = true }
+unreachable = "1.0.0"
+bytes = "1.5.0"
+
+[dev-dependencies]
+divan = { workspace = true }
+rstest = { workspace = true }
+
+[[bench]]
+name = "day-19"
+path = "benches/benchmarks.rs"
+harness = false
+
+[features]
+dhat-heap = []

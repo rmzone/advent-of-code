@@ -1,0 +1,9 @@
+[package]
+name = "day-23"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+nom = { workspace = true }
+itertools = { workspace = true }

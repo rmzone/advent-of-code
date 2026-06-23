@@ -1,0 +1,11 @@
+[package]
+name = "day-15"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+nom = { workspace = true }
+nom_locate = { workspace = true }
+glam = { workspace = true }
+ordermap = "0.5.4"

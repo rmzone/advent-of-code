@@ -1,0 +1,23 @@
+[package]
+name = "day-03"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+itertools = { workspace = true }
+nom = { workspace = true }
+miette = { workspace = true }
+thiserror = { workspace = true }
+dhat = { workspace = true }
+
+[dev-dependencies]
+divan = { workspace = true }
+
+[[bench]]
+name = "day-03"
+path = "benches/benchmarks.rs"
+harness = false
+
+[features]
+dhat-heap = []

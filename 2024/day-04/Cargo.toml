@@ -1,0 +1,10 @@
+[package]
+name = "day-04"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+glam = { workspace = true }
+nom = { workspace = true }
+nom_locate = { workspace = true }

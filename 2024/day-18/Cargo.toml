@@ -1,0 +1,12 @@
+[package]
+name = "day-18"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+nom = {workspace = true }
+glam = { workspace = true }
+pathfinding = "4.13.1"
+
+[dev-dependencies]

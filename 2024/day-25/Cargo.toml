@@ -1,0 +1,12 @@
+[package]
+name = "day-25"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+itertools = { workspace = true }
+nom = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]

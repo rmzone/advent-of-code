@@ -1,0 +1,124 @@
+use common::custom_error::Result;
+use nom::character::complete::{line_ending, satisfy};
+use nom::multi::{many1, separated_list1};
+use nom::IResult;
+use nom_locate::{position, LocatedSpan};
+use petgraph::{algo::condensation, dot::Dot, prelude::*, visit::IntoNodeReferences};
+use std::collections::HashMap;
+
+// Notes:
+// https://docs.rs/petgraph/latest/petgraph/
+// https://cp-algorithms.com/graph/strongly-connected-components.html
+
+pub type Span<'a> = LocatedSpan<&'a str>; // trick to simplify usage
+
+const DIRECTIONS: [[i32; 2]; 4] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+
+pub fn process(input: &str) -> Result<String> {
+    let (_, map) = process_input(Span::new(input)).expect("Should parse!");
+    let graph = generate_graph(&map);
+    let new_graph = generate_condensed_graph(&graph);
+
+    println!("{:?}", Dot::with_config(&new_graph, &[]));
+
+    // process the graph
+    let mut result = 0usize;
+
+    for (_node_index, node_list) in new_graph.node_references() {
+        let area = node_list.len();
+        let perimeter = node_list
+            .iter()
+            .map(|n| 4 - graph.neighbors(*n).count())
+            .sum::<usize>();
+        result += area * perimeter;
+    }
+
+    Ok(result.to_string())
+}
+
+fn generate_condensed_graph(
+    graph: &GraphMap<(i32, i32), (), Undirected>,
+) -> Graph<Vec<(i32, i32)>, (), Undirected, NodeIndex> {
+    condensation(graph.clone().into_graph::<NodeIndex>(), false)
+}
+
+fn generate_graph(map: &HashMap<(i32, i32), char>) -> GraphMap<(i32, i32), (), Undirected> {
+    let mut graph = UnGraphMap::<(i32, i32), ()>::new();
+    for ((x, y), c) in map.iter() {
+        let node = graph.add_node((*x, *y));
+
+        for [x1, y1] in DIRECTIONS.iter() {
+            // add edge if there is a map element adjacent
+            let new_node = (x + x1, y + y1);
+
+            if map.get(&new_node).is_some_and(|c2| c == c2) {
+                graph.add_edge(node, new_node, ());
+            }
+        }
+    }
+
+    graph
+}
+
+fn process_input(input: Span) -> IResult<Span, HashMap<(i32, i32), char>> {
+    let (input, lines) = separated_list1(line_ending, many1(process_cell))(input)?;
+
+    let hashmap = lines
+        .iter()
+        .flatten()
+        .copied()
+        .collect::<HashMap<(i32, i32), char>>();
+
+    Ok((input, hashmap))
+}
+
+fn process_cell(input: Span) -> IResult<Span, ((i32, i32), char)> {
+    let (input, pos) = position(input)?;
+    let x = pos.get_column() as i32 - 1;
+    let y = pos.location_line() as i32 - 1;
+    let (input, c) = satisfy(|c| c.is_alphanumeric())(input)?;
+
+    Ok((input, ((x, y), c)))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_example1() -> Result<()> {
+        let input = "AAAA
+BBCD
+BBCC
+EEEC";
+        assert_eq!("140", process(input)?);
+        Ok(())
+    }
+
+    #[test]
+    fn test_example2() -> Result<()> {
+        let input = "OOOOO
+OXOXO
+OOOOO
+OXOXO
+OOOOO";
+        assert_eq!("772", process(input)?);
+        Ok(())
+    }
+
+    #[test]
+    fn test_process() -> Result<()> {
+        let input = "RRRRIICCFF
+RRRRIICCCF
+VVRRRCCFFF
+VVRCCCJFFF
+VVVVCJJCFE
+VVIVCCJJEE
+VVIIICJJEE
+MIIIIIJJEE
+MIIISIJEEE
+MMMISSJEEE";
+        assert_eq!("1930", process(input)?);
+        Ok(())
+    }
+}

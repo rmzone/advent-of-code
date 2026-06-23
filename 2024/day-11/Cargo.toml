@@ -1,0 +1,9 @@
+[package]
+name = "day-11"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+nom = { workspace = true }
+num-traits = "0.2.19"

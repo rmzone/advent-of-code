@@ -1,0 +1,26 @@
+[package]
+name = "day-01"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+substring = "1.4.5"
+common = { path = "../common" }
+phf = { version = "0.11", features = ["macros"] }
+itertools = { workspace = true }
+nom = { workspace = true }
+miette = { workspace = true }
+thiserror = { workspace = true }
+dhat = { workspace = true }
+bytes = { workspace = true }
+
+[dev-dependencies]
+divan = { workspace = true }
+
+[[bench]]
+name = "day-01"
+path = "benches/benchmarks.rs"
+harness = false
+
+[features]
+dhat-heap = []

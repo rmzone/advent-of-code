@@ -1,0 +1,12 @@
+[package]
+name = "day-20"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+nom = { workspace = true }
+nom_locate = { workspace = true }
+glam = { workspace = true }
+pathfinding = "4.13.1"
+itertools = "0.14.0"
