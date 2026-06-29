@@ -228,14 +228,9 @@ version = "0.1.0"
 dependencies = [
  "common",
  "divan",
- "itertools",
- "log",
  "nom",
- "rstest",
  "test-log",
- "thiserror",
  "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]

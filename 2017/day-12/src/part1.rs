@@ -1,54 +1,17 @@
-use crate::{parse_input, Program};
+use crate::{count_paths, parse_input};
 use common::custom_error::Result;
-use itertools::Itertools;
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashSet, VecDeque};
 
 #[tracing::instrument(skip(input))]
 pub fn process(input: &str) -> Result<String> {
-    let (_, programs) = parse_input(input)?;
-    let mut cache: HashMap<i32, i32> = HashMap::new();
+    let (_, mut programs) = parse_input(input)?;
 
-    let result = programs
-        .iter()
-        .map(|program| count_paths(program, &mut cache))
-        .sum::<i32>();
+    let mut queue: VecDeque<i32> = VecDeque::new();
+    let mut visited: HashSet<i32> = HashSet::new();
+
+    let result = count_paths(0, &mut programs, &mut queue, &mut visited);
 
     Ok(result.to_string())
-}
-
-// path counting from each node to `0`
-// dp with memo
-// if we already parsed a node then save if it is connected to `0`
-// We assume this is a DAG without cycles
-// use dynamic programming to find the count of paths from the current node to the '0'.
-// Each nodes path is the sum of the paths of its neighbors.
-pub fn count_paths(program: &Program, cache: &mut HashMap<i32, i32>) -> i32 {
-    let mut queue: VecDeque<(i32, i32)> = VecDeque::new(); // parent, child node
-
-    for child in &program.connections {
-        queue.push_back((program.id, *child));
-    }
-
-    while let Some((parent, child)) = queue.pop_front() {
-
-        //     if lights == machine.lights {
-        //         // println!("Count: {}", count);
-        //         return count;
-        //     }
-
-        //     for neighbor in &machine.buttons {
-        //         let button = neighbor
-        //             .iter()
-        //             .fold(lights, |acc, n| acc ^ (1usize << (bits - n - 1)));
-        //
-        //         if visited.insert(button) {
-        //             // println!("{:08b} {:08b} {:?} {}", &lights, &button, &neighbor, &count);
-        //             queue.push_back((button, count + 1));
-        //         }
-        //     }
-    }
-
-    0
 }
 
 #[cfg(test)]
