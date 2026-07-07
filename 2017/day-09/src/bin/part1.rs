@@ -8,3 +8,5 @@ fn main() -> Result<()> {
     println!("answer: `{}`, time: {:?}", result, now.elapsed());
     Ok(())
 }
+
+// answer: `10800`, time: 348.6µs

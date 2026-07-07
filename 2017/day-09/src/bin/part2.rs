@@ -1,5 +1,5 @@
-use day_09::part2::process;
 use common::custom_error::Result;
+use day_09::part2::process;
 
 fn main() -> Result<()> {
     let now = std::time::Instant::now();
@@ -8,3 +8,5 @@ fn main() -> Result<()> {
     println!("answer: `{}`, time: {:?}", result, now.elapsed());
     Ok(())
 }
+
+// answer: `4522`, time: 254.8µs

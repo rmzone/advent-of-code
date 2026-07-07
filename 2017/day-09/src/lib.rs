@@ -1,10 +1,10 @@
+use nom::IResult;
+use nom::Parser;
 use nom::bytes::complete::{tag, take};
 use nom::character::complete::one_of;
 use nom::combinator::opt;
 use nom::multi::separated_list0;
 use nom::sequence::delimited;
-use nom::IResult;
-use nom::Parser;
 
 pub mod part1;
 pub mod part2;
@@ -15,6 +15,16 @@ pub struct Group {
     children: Vec<Group>,
 }
 
+impl Group {
+    pub fn new() -> Group {
+        Group {
+            garbage: Vec::new(),
+            children: Vec::new(),
+        }
+    }
+}
+
+// not working :(
 pub fn parse_input(input: &str) -> IResult<&str, Group> {
     let (input, _) = tag("{").parse(input)?;
     let (input, g) = opt(parse_garbage).parse(input)?;
