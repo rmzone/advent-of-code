@@ -1,22 +1,21 @@
-use tracing::info;
-use crate::{Machine, parse_input};
+use crate::{parse_input, Machine};
 use common::custom_error::Result;
+use std::cell::RefCell;
+use std::collections::VecDeque;
+use std::rc::Rc;
 
 #[tracing::instrument(skip(input))]
 pub fn process(input: &str) -> Result<String> {
     let (_, instructions) = parse_input(input)?;
+    let queue: Rc<RefCell<VecDeque<i64>>> = Rc::new(RefCell::new(VecDeque::new()));
+    let mut machine = Machine::new(&instructions, 0, Rc::clone(&queue), Rc::clone(&queue));
 
-    // for instruction in &instructions {
-    //     info!("{:?}", &instruction);
-    // }
-
-    let mut machine = Machine::new(instructions);
-
-    while !machine.step() {
-        machine.step();
+    let mut done = false;
+    while !done {
+        done = machine.step();
     }
 
-    Ok(machine.recover.to_string())
+    Ok(machine.first_non_zero_recv.to_string())
 }
 
 #[cfg(test)]

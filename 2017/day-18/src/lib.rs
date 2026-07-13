@@ -1,33 +1,54 @@
 use nom::character::complete;
-use nom::character::complete::{alpha1, alphanumeric1, line_ending, one_of, space0, space1};
+use nom::character::complete::{alphanumeric1, line_ending, one_of, space0, space1};
 use nom::combinator::opt;
 use nom::multi::separated_list1;
 use nom::{IResult, Parser};
-use std::collections::HashMap;
+use std::cell::RefCell;
+use std::collections::{HashMap, VecDeque};
+use std::rc::Rc;
 use tracing::info;
 
 pub mod part1;
 pub mod part2;
 
-pub struct Machine {
+pub struct Machine<'a> {
+    id: i64,
     pc: usize,
     registers: HashMap<char, i64>,
-    recover: i64,
-    instructions: Vec<Instruction>,
+    instructions: &'a Vec<Instruction>,
     halted: bool,
-    is_jump: bool,
+    pub is_await: bool,
+    send_queue: Rc<RefCell<VecDeque<i64>>>,
+    receive_queue: Rc<RefCell<VecDeque<i64>>>,
+    pub send_count: i64,
+    pub last_sent: i64,
+    pub first_non_zero_recv: i64,
 }
 
-impl Machine {
-    pub fn new(instructions: Vec<Instruction>) -> Machine {
-        Machine {
+impl<'a> Machine<'a> {
+    pub fn new(
+        instructions: &'a Vec<Instruction>,
+        id: i64,
+        send_queue: Rc<RefCell<VecDeque<i64>>>,
+        receive_queue: Rc<RefCell<VecDeque<i64>>>,
+    ) -> Machine<'a> {
+        let mut machine = Machine {
+            id,
             pc: 0,
             registers: HashMap::default(),
-            recover: 0,
+            send_count: 0,
             instructions,
+            receive_queue,
+            send_queue,
             halted: false,
-            is_jump: false,
-        }
+            is_await: false,
+            last_sent: 0,
+            first_non_zero_recv: 0,
+        };
+
+        machine.set_register(&'p', id);
+
+        machine
     }
 
     pub fn step(&mut self) -> bool {
@@ -44,49 +65,61 @@ impl Machine {
             Instruction::Mul(x, y) => self.mul(&x, &y),
             Instruction::Mod(x, y) => self.div(&x, &y),
             Instruction::Jump(x, y) => self.jump(&x, &y),
-            Instruction::Send(x) => self.play_sound(&x),
-            Instruction::Receive(x) => self.recover(&x),
+            Instruction::Send(x) => self.send(&x),
+            Instruction::Receive(x) => self.receive(&x),
         };
 
-        if !self.is_jump {
-            self.pc += 1;
-        }
-        else {
-            self.is_jump = false;
-        }
+        self.pc += 1;
 
-        info!("PC: {} , REG: {:?}", &self.pc, &self.registers);
+        info!(
+            "{} : PC: {}, REG: {:?}, Send Count: {}",
+            &self.id, &self.pc, &self.registers, &self.send_count
+        );
 
-        self.halted
+        self.is_await || self.halted
     }
 
-    fn recover(&mut self, param1: &Parameter) {
+    fn receive(&mut self, param1: &Parameter) {
         if let Parameter::Register(reg) = param1 {
-            let value = self.get_register(reg);
-            if value > 0 {
-                self.halted = true;
+            if self.first_non_zero_recv == 0 && self.get_register(reg) != 0 {
+                self.first_non_zero_recv = self.last_sent;
+            }
+
+            if self.receive_queue.borrow_mut().is_empty() {
+                self.is_await = true;
+                self.pc -= 1;
+            } else {
+                let value = self.receive_queue.borrow_mut().pop_front().unwrap();
+                self.set_register(reg, value);
+                self.is_await = false;
             }
         }
     }
 
-    fn play_sound(&mut self, param1: &Parameter) {
-        if let Parameter::Register(reg) = param1 {
-            let value = self.get_register(reg);
-            self.recover = value;
-        }
+    fn send(&mut self, param1: &Parameter) {
+        let operand = match param1 {
+            Parameter::Register(reg) => self.get_register(reg),
+            Parameter::Value(val) => *val,
+        };
+
+        self.send_queue.try_borrow_mut().unwrap().push_back(operand);
+        self.send_count += 1;
+        self.last_sent = operand;
     }
 
     fn jump(&mut self, param1: &Parameter, param2: &Parameter) {
-        if let Parameter::Value(offset) = param2 {
-            let condition = match param1 {
-                Parameter::Register(reg2) => self.get_register(reg2),
-                Parameter::Value(val) => *val,
-            };
+        let condition = match param1 {
+            Parameter::Register(reg) => self.get_register(reg),
+            Parameter::Value(val) => *val,
+        };
 
-            if condition > 0 {
-                self.pc = (self.pc as i64 + offset) as usize;
-                self.is_jump = true;
-            }
+        let offset = match param2 {
+            Parameter::Register(reg) => self.get_register(reg),
+            Parameter::Value(val) => *val,
+        };
+
+        if condition > 0 {
+            self.pc = (self.pc as i64 + offset - 1) as usize;
         }
     }
 

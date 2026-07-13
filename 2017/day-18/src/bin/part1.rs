@@ -1,5 +1,5 @@
-use day_18::part1::process;
 use common::custom_error::Result;
+use day_18::part1::process;
 
 fn main() -> Result<()> {
     let now = std::time::Instant::now();

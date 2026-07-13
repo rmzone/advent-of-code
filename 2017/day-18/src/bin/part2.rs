@@ -1,5 +1,5 @@
-use day_18::part2::process;
 use common::custom_error::Result;
+use day_18::part2::process;
 
 fn main() -> Result<()> {
     let now = std::time::Instant::now();
@@ -9,5 +9,4 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-// answer: `15240`, time: 102.5904m !!!TOO HIGH!!!
-
+// answer: `7620`, time: 49.571125ms
