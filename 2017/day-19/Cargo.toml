@@ -7,7 +7,6 @@ edition = "2024"
 common = { path = "../common" }
 glam = { workspace = true }
 nom = { workspace = true }
-log = { workspace = true }
 tracing = { workspace = true }
 
 [dev-dependencies]

@@ -1,17 +1,28 @@
+use crate::{parse_input, Direction};
 use common::custom_error::Result;
-use log::info;
 use common::parsing::Span;
-use crate::parse_input;
+use tracing::info;
 
 #[tracing::instrument(skip(input))]
 pub fn process(input: &str) -> Result<String> {
     let (_, map) = parse_input(Span::new(input))?;
 
-    // get start and direction down
+    let mut position = map.find_start().unwrap();
 
-    info!("{:?}", map);
+    info!("map: {:?}", &map);
+    info!("start: {:?}", &position);
 
-    Ok("".to_string())
+    let mut direction = Direction::South;
+    let mut letters: Vec<char> = Vec::new();
+
+    while direction != Direction::End {
+        let (new_position, new_direction) = map.follow_tube(&position, &direction, &mut letters);
+        position = new_position;
+        direction = new_direction;
+        info!("positon: {:?}, direction: {:?}", &position, &direction);
+    }
+
+    Ok(letters.into_iter().collect())
 }
 
 #[cfg(test)]
@@ -28,7 +39,7 @@ mod tests {
      |  |  |  D
      +B-+  +--+
 ";
-        assert_eq!("ABCDE", process(input)?);
+        assert_eq!("ABCDEF", process(input)?);
         Ok(())
     }
 }

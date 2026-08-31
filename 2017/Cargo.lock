@@ -304,6 +304,18 @@ dependencies = [
  "common",
  "divan",
  "glam",
+ "nom",
+ "test-log",
+ "tracing",
+]
+
+[[package]]
+name = "day-20"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "divan",
+ "glam",
  "log",
  "nom",
  "test-log",
