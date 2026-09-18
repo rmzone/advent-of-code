@@ -25,3 +25,6 @@ input*.txt
 
 # Apple
 .DS_Store
+
+Cargo.lock
+
