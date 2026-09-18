@@ -83,18 +83,6 @@ version = "0.1.0"
 dependencies = [
  "common",
  "divan",
- "nom",
- "test-log",
- "tracing",
-]
-
-[[package]]
-name = "day-02"
-version = "0.1.0"
-dependencies = [
- "common",
- "divan",
- "nom",
  "test-log",
  "tracing",
 ]

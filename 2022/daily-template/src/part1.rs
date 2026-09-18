@@ -1,5 +1,5 @@
 use common::custom_error::Result;
-use log::info;
+use tracing::info;
 
 #[tracing::instrument(skip(input))]
 pub fn process(input: &str) -> Result<String> {
