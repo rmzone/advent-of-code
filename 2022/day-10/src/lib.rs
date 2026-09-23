@@ -18,6 +18,7 @@ pub enum Instruction {
 pub struct CathodeRayTube {
     cycles: usize,
     register_x: i32,
+    raster: String,
 }
 
 impl CathodeRayTube {
@@ -25,6 +26,7 @@ impl CathodeRayTube {
         CathodeRayTube {
             cycles: 0,
             register_x: 1,
+            raster: "".to_string(),
         }
     }
 
@@ -37,6 +39,22 @@ impl CathodeRayTube {
         };
 
         for _ in 0..cycle_count {
+            // next raster
+            if [40, 80, 120, 160, 200, 240]
+                .iter()
+                .any(|&x| x == self.cycles)
+            {
+                self.raster += "\n";
+            }
+
+            // output pixel
+            let row: i32 = (self.cycles % 40) as i32;
+            if row >= self.register_x - 1 && row <= self.register_x + 1 {
+                self.raster += "#";
+            } else {
+                self.raster += ".";
+            }
+
             self.cycles += 1;
 
             // output signal strength for specific cycles, otherwise 0

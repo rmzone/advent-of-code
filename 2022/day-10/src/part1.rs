@@ -1,4 +1,4 @@
-use crate::{CathodeRayTube, parse_input};
+use crate::{parse_input, CathodeRayTube};
 use common::custom_error::Result;
 use tracing::info;
 

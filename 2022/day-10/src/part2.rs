@@ -1,6 +1,6 @@
-use tracing::info;
-use common::custom_error::Result;
 use crate::{parse_input, CathodeRayTube};
+use common::custom_error::Result;
+use tracing::info;
 
 #[tracing::instrument(skip(input))]
 pub fn process(input: &str) -> Result<String> {
@@ -9,13 +9,11 @@ pub fn process(input: &str) -> Result<String> {
 
     let mut crt = CathodeRayTube::new();
 
-    let total_strength: i64 = instructions
-        .iter()
-        .fold(0, |acc, instruction| acc + crt.execute(&instruction));
+    for instruction in instructions {
+        crt.execute(&instruction);
+    }
 
-    // todo: render output
-    
-    Ok(total_strength.to_string())
+    Ok(crt.raster.to_string())
 }
 
 #[cfg(test)]
@@ -171,12 +169,15 @@ addx -11
 noop
 noop
 noop";
-        assert_eq!("##..##..##..##..##..##..##..##..##..##..
+        assert_eq!(
+            "##..##..##..##..##..##..##..##..##..##..
 ###...###...###...###...###...###...###.
 ####....####....####....####....####....
 #####.....#####.....#####.....#####.....
 ######......######......######......####
-#######.......#######.......#######.....", process(input)?);
+#######.......#######.......#######.....",
+            process(input)?
+        );
         Ok(())
     }
 }
