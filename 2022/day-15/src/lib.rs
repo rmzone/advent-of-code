@@ -1,17 +1,17 @@
-use std::collections::HashMap;
-use std::ops::RangeInclusive;
+use nom::IResult;
 use nom::Parser;
 use nom::bytes::complete::tag;
 use nom::character::complete::line_ending;
 use nom::combinator::map;
-use nom::IResult;
 use nom::multi::separated_list1;
 use nom::sequence::{preceded, separated_pair};
+use std::collections::HashMap;
+use std::ops::RangeInclusive;
 
 pub mod part1;
 pub mod part2;
 
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Sensor {
     pub x: i64,
     pub y: i64,
@@ -19,8 +19,8 @@ pub struct Sensor {
 
 impl Sensor {
     /// Manhattan distance between a sensor and beacon
-    pub fn distance_to_beacon(&self, beacon_: &Beacon) -> i64 {
-        (self.x - beacon_.x).abs() + (self.y - beacon_.y).abs()
+    pub fn distance_to_beacon(&self, beacon: &Beacon) -> i64 {
+        (self.x - beacon.x).abs() + (self.y - beacon.y).abs()
     }
 
     /// Check whether a given y-index is reachable by the given sensor
@@ -34,7 +34,7 @@ impl Sensor {
     /// at the target y-index
     pub fn x_coverage_at_y(&self, max_distance: i64, target_y_index: i64) -> RangeInclusive<i64> {
         let delta = max_distance - (self.y - target_y_index).abs();
-        (self.x-delta..=self.x+delta)
+        self.x - delta..=self.x + delta
     }
 
     /// Returns a range of the y values, representing the min-max distance from the sensor
@@ -43,16 +43,45 @@ impl Sensor {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Beacon {
     pub x: i64,
     pub y: i64,
 }
 
+/// Represents a diagonal line. The Positive variant indicates a line with a slope
+/// of 1 and the Negative variant indicates a line with a slope of -1.
+#[derive(Debug, Eq, PartialEq, Hash)]
+pub enum DiagonalLine {
+    Positive(i64),
+    Negative(i64),
+}
+
+impl DiagonalLine {
+    pub fn intersects(&self, other: &DiagonalLine) -> Option<Beacon> {
+        // can only intersect if they are opposite slopes
+        use DiagonalLine::*;
+        let (a, b) = match (self, other) {
+            (Positive(b), Negative(a)) => (a, b),
+            (Negative(a), Positive(b)) => (a, b),
+            (Positive(_), Positive(_)) => return None,
+            (Negative(_), Negative(_)) => return None,
+        };
+
+        let x = (a - b) / 2;
+        let y = x + b;
+
+        Some(Beacon { x, y })
+    }
+}
+
 pub fn parse_input(input: &str) -> IResult<&str, HashMap<Sensor, Beacon>> {
     let (input, lines) = separated_list1(line_ending, line).parse(input)?;
 
-    Ok((input, lines.into_iter().collect::<HashMap<Sensor, Beacon>>()))
+    Ok((
+        input,
+        lines.into_iter().collect::<HashMap<Sensor, Beacon>>(),
+    ))
 }
 
 fn line(input: &str) -> IResult<&str, (Sensor, Beacon)> {
@@ -69,5 +98,6 @@ fn position(input: &str) -> IResult<&str, (i64, i64)> {
         preceded(tag("x="), nom::character::complete::i64),
         tag(", "),
         preceded(tag("y="), nom::character::complete::i64),
-    ).parse(input)
+    )
+    .parse(input)
 }

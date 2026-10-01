@@ -9,7 +9,7 @@ fn main() {
 fn part1() {
     part1::process(divan::black_box(include_str!(
         "../input.txt",
-    )))
+    )), 10)
         .unwrap();
 }
 
@@ -17,6 +17,6 @@ fn part1() {
 fn part2() {
     part2::process(divan::black_box(include_str!(
         "../input.txt",
-    )))
+    )), 20)
         .unwrap();
 }
