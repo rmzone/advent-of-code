@@ -1,19 +1,50 @@
 use std::collections::HashMap;
+use std::ops::Index;
 use common::custom_error::Result;
 use tracing::info;
-use crate::{parse_input, ValveState, Valve};
+use crate::{dijkstra, get_distance_map, parse_input, valve, Valve};
 
 #[tracing::instrument(skip(input))]
 pub fn process(input: &str) -> Result<String> {
-    let (_, mut valves) = parse_input(input)?;
-    info!("{:?}", valves.len());
+    let (_, valves) = parse_input(input)?;
+    info!("{:?}", valves);
 
-    // TODO: ???
-    // Use dijkstra's to generate distances to each valve
+    // Map valve names to a index value based on the position in the valve list.
+    let valve_map: HashMap<&str, usize> = valves.
+        iter()
+        .enumerate()
+        .map(|(index, valve)| (valve.name, index))
+        .collect();
+
+    let distance_map = get_distance_map(&valves, &valve_map);
+
+    info!("{:?}", distance_map);
+
     // Use DFS to find all possible paths, eliminating those where the valve has zero pressure
     // Calculate the released pressure for each path, return the max
 
+    let start = valve_map["AA"];
+
+    // collect the starting list of valves with non-zero flow rates
+    let closed_valves: Vec<&Valve> = valves
+        .iter()
+        //.enumerate()
+        .filter(|(_, valve)| valve.rate > 0)
+        .map(|(index, _)| valve)
+        .collect();
+
+
+    Ok("total_pressure".to_string())
+}
+
+
+/*
+pub fn process_sample(input: &str) -> Result<String> {
+    let (_, mut valves) = parse_input(input)?;
+    info!("{:?}", valves.len());
+
     // find the correct order to open the valves in order to get the maximum flow in 30min
+    // this algorithm only works on the sample data
     let mut current_valve_id = "AA";
     //let mut max_rate = 0;
     let mut time_elapsed = 0;
@@ -47,7 +78,7 @@ pub fn process(input: &str) -> Result<String> {
 
         let current_valve = valves.get(current_valve_id).unwrap();
 
-        if current_valve.state == ValveState::Closed && current_valve.rate > 0 {
+        if current_valve.state == ValveState::Closed && current_valve.rate > 2 {
             //max_rate = current_valve.rate;
             let valve_to_open = valves.get_mut(current_valve_id).unwrap();
             valve_to_open.state = ValveState::Open;
@@ -60,7 +91,6 @@ pub fn process(input: &str) -> Result<String> {
                 println!("You can't move!!!");
             }
         }
-
 
         println!();
     }
@@ -77,18 +107,9 @@ fn get_next_open_tunnel<'a>(current_valve: &Valve<'a>, valves: &HashMap<&str, Va
         }
     }
 
-    // let foo  = valves
-    //     .iter()
-    //     .filter(|(k, v)| current_valve.tunnels.contains(k) && v.state == ValveState::Closed && v.rate > 0)
-    //     .map(|(_, v)| v)
-    //     .collect::<Vec<_>>();
-    //
-    // if let Some(val) =  foo.iter().max_by(|a, b| a.rate.cmp(&b.rate)) {
-    //     return Some(val.name);
-    // }
-
     None
 }
+*/
 
 #[cfg(test)]
 mod tests {
