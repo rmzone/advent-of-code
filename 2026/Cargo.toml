@@ -1,0 +1,44 @@
+[workspace]
+members = [
+    "common",
+    "day-*",
+]
+default-members = ["day-*"]
+resolver = "3"
+
+[workspace.dependencies]
+bitvec = "1.0.1"
+bytes = "1.5.0"
+cached = "4.0.0"
+ctor = "1.0.13"
+dhat = "0.3.2"
+divan = "0.1.4"
+glam = "0.33.7"
+itertools = "0.15.0"
+log = "0.4.28"
+nom = "8.0.0"
+nom-supreme = "0.8.0"
+nom_locate = "5.0.0"
+once_cell = "1.19.0"
+pathfinding = "4.14"
+petgraph = "0.8.3"
+rayon = "1.8.0"
+rstest = "0.27.0"
+rstest_reuse = "0.7.0"
+thiserror = "2.0.20"
+tracing = "0.1.43"
+tracing-tracy = "0.12.0"
+tracy-client = "0.19.0"
+tracy-client-sys = "0.30.0"
+
+[workspace.dependencies.test-log]
+version = "0.2.13"
+features = ["trace"]
+default-features = false
+
+[workspace.dependencies.tracing-subscriber]
+version = "0.3.18"
+features = [
+    "fmt",
+    "env-filter",
+]
